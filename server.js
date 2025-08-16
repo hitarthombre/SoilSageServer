@@ -5,7 +5,7 @@ const logger = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 // Connect to MongoDB
 connectDB();
@@ -22,5 +22,5 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
