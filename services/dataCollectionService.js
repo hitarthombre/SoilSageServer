@@ -7,6 +7,9 @@ class DataCollectionService {
     this.isRunning = false;
     this.collectionInterval = null;
     this.aggregationInterval = null;
+    this.lastCollectionTime = null;
+    this.collectionCount = 0;
+    this.lastError = null;
   }
 
   async startDataCollection() {
@@ -49,18 +52,21 @@ class DataCollectionService {
     try {
       const firebaseUrl = process.env.FIREBASE_URL;
       if (!firebaseUrl) {
+        this.lastError = "FIREBASE_URL not configured";
         console.error("FIREBASE_URL not configured");
         return;
       }
 
       const response = await axios.get(`${firebaseUrl}/trial.json`);
       if (response.status !== 200) {
+        this.lastError = "Failed to fetch data from Firebase";
         console.error("Failed to fetch data from Firebase");
         return;
       }
 
       const data = response.data;
       if (!data) {
+        this.lastError = "No data available from Firebase";
         console.log("No data available from Firebase");
         return;
       }
@@ -83,10 +89,17 @@ class DataCollectionService {
       });
 
       await sensorData.save();
-      console.log(`Sensor data collected at ${new Date().toISOString()}`);
+      
+      // Update tracking
+      this.lastCollectionTime = new Date();
+      this.collectionCount++;
+      this.lastError = null;
+      
+      console.log(`✅ Sensor data collected at ${this.lastCollectionTime.toISOString()} (Total: ${this.collectionCount})`);
 
     } catch (error) {
-      console.error("Error collecting sensor data:", error.message);
+      this.lastError = error.message;
+      console.error("❌ Error collecting sensor data:", error.message);
     }
   }
 
@@ -137,10 +150,10 @@ class DataCollectionService {
       });
 
       await dailyAggregate.save();
-      console.log(`Daily aggregate created for ${today.toDateString()}`);
+      console.log(`📊 Daily aggregate created for ${today.toDateString()} with ${sensorData.length} readings`);
 
     } catch (error) {
-      console.error("Error aggregating daily data:", error.message);
+      console.error("❌ Error aggregating daily data:", error.message);
     }
   }
 
@@ -218,6 +231,17 @@ class DataCollectionService {
     const midnight = new Date(now);
     midnight.setHours(24, 0, 0, 0);
     return midnight - now;
+  }
+
+  // Get service status for monitoring
+  getStatus() {
+    return {
+      isRunning: this.isRunning,
+      lastCollectionTime: this.lastCollectionTime,
+      collectionCount: this.collectionCount,
+      lastError: this.lastError,
+      nextCollectionTime: this.lastCollectionTime ? new Date(this.lastCollectionTime.getTime() + 600000) : null
+    };
   }
 }
 

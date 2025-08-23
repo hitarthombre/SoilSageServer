@@ -162,7 +162,65 @@ JWT_EXPIRES_IN=15m
 BCRYPT_SALT_ROUNDS=12
 CORS_ORIGIN=http://localhost:5173
 FIREBASE_URL=https://yourproject-code-default-rtdb.continent-part.firebasedatabase.app
+SERVER_URL=https://your-app-name.onrender.com
 ```
+
+**Note:** `SERVER_URL` is required for production deployment (e.g., Render, Heroku, Railway).
+
+## Keep-Alive System (Free Hosting Tiers)
+
+### **Problem with Free Hosting**
+- **Render/Heroku free tiers** put servers to sleep after 15 minutes
+- **Background processes stop** (including 10-minute data collection)
+- **Server wakes up only** when receiving HTTP requests
+
+### **Solution: External Ping Service**
+Use free services to ping your server every 5 minutes:
+
+#### **Option 1: UptimeRobot (Recommended)**
+1. Go to [uptimerobot.com](https://uptimerobot.com)
+2. Create free account
+3. Add new monitor:
+   - **URL**: `https://your-app-name.onrender.com/keep-alive`
+   - **Type**: HTTP(s)
+   - **Interval**: 5 minutes
+   - **Alert**: Disable (optional)
+
+#### **Option 2: Cron-job.org**
+1. Go to [cron-job.org](https://cron-job.org)
+2. Create free account
+3. Add new cron job:
+   - **URL**: `https://your-app-name.onrender.com/keep-alive`
+   - **Schedule**: Every 5 minutes
+   - **HTTP Method**: GET
+
+#### **Option 3: GitHub Actions (Free)**
+```yaml
+# .github/workflows/keep-alive.yml
+name: Keep Server Alive
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Server
+        run: |
+          curl -s "https://your-app-name.onrender.com/keep-alive"
+```
+
+### **Keep-Alive Endpoints**
+- `GET /` - Root endpoint with server info
+- `GET /keep-alive` - Detailed status (use for external pinging)
+- `GET /health` - Simple health check
+
+### **How It Works**
+1. **External service pings** `/keep-alive` every 5 minutes
+2. **Server stays awake** and responds to requests
+3. **Data collection continues** every 10 minutes
+4. **Free hosting works** without upgrading to paid plans
 
 ## Sensors API
 
@@ -236,3 +294,68 @@ The server automatically:
   - UV exposure hours (UV index > 3.0)
   - Temperature/humidity min/max/avg
 - Generates comprehensive reports with PDF output
+
+## System Monitoring API
+
+Monitor the automatic data collection system:
+
+- GET `/api/system/status`
+  - Overall system health and status
+  - Data collection service status
+  - Database statistics
+
+- GET `/api/system/history?limit=20`
+  - Recent data collection history
+  - Recent daily aggregates
+  - Default limit: 20 records
+
+- POST `/api/system/test-collection`
+  - Manually trigger data collection for testing
+  - Useful to verify Firebase connectivity
+
+- GET `/api/system/logs?hours=24`
+  - Detailed collection logs for specified hours
+  - Hourly statistics and collection rates
+  - Performance monitoring
+
+## How to Verify Automatic Operation
+
+### 1. **Check System Status**
+```bash
+curl http://localhost:3000/api/system/status
+```
+Look for:
+- `"dataCollection": { "isRunning": true }`
+- Recent collection timestamps
+- Total sensor readings count
+
+### 2. **Monitor Collection History**
+```bash
+curl http://localhost:3000/api/system/history
+```
+Should show recent sensor data collections every 10 minutes.
+
+### 3. **Test Manual Collection**
+```bash
+curl -X POST http://localhost:3000/api/system/test-collection
+```
+Verify Firebase connectivity and data storage.
+
+### 4. **Check Collection Logs**
+```bash
+curl "http://localhost:3000/api/system/logs?hours=6"
+```
+Should show ~36 collections in 6 hours (every 10 minutes).
+
+### 5. **Watch Console Logs**
+Server console should show:
+```
+✅ Sensor data collected at 2024-01-01T10:00:00.000Z (Total: 1)
+✅ Sensor data collected at 2024-01-01T10:10:00.000Z (Total: 2)
+📊 Daily aggregate created for Mon Jan 01 2024 with 144 readings
+```
+
+### 6. **Verify Data Retention**
+- Sensor data: Automatically deleted after 24 hours
+- Daily aggregates: Stored permanently for reporting
+- Check MongoDB collections: `SensorData` and `DailyAggregates`
