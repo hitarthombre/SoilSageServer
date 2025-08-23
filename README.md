@@ -192,3 +192,47 @@ FIREBASE_URL=https://yourproject-code-default-rtdb.continent-part.firebasedataba
       }
     }
     ```
+
+- GET `/api/sensors/battery`
+  - Fetches only battery status from Firebase
+  - Returns battery percentage and voltage
+  - Response format:
+    ```json
+    {
+      "success": true,
+      "data": {
+        "battery_percent": 85,
+        "battery_voltage": 3.7,
+        "timestamp": "2024-01-01T00:00:00.000Z"
+      }
+    }
+    ```
+
+## Reports API
+
+- POST `/api/reports/generate`
+  - Generates PDF report for specified date range
+  - Body: `{ "startDate": "2024-01-01", "endDate": "2024-01-07", "reportType": "daily" }`
+  - Report types: "daily" (aggregated) or "detailed" (raw data)
+
+- GET `/api/reports/data?startDate=2024-01-01&endDate=2024-01-07`
+  - Retrieves report data for date range without generating PDF
+
+- GET `/api/reports/last24hours`
+  - Gets sensor data from last 24 hours
+  - Includes both raw sensor data and daily aggregates
+
+- GET `/api/reports/download/:filename`
+  - Downloads generated PDF report
+
+## Data Collection System
+
+The server automatically:
+- Collects sensor data every 10 minutes from Firebase
+- Stores data in MongoDB with TTL (auto-deletes after 24 hours)
+- Aggregates daily data at midnight including:
+  - Sunlight hours (lux > 1000)
+  - Water level averages
+  - UV exposure hours (UV index > 3.0)
+  - Temperature/humidity min/max/avg
+- Generates comprehensive reports with PDF output
