@@ -12,16 +12,7 @@ router.get("/health", healthCheck);
 // Root endpoint that also keeps server awake
 router.get("/", (req, res) => {
   res.json({
-    message: "Soil Sage Server is running",
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      keepAlive: "/keep-alive",
-      health: "/health",
-      sensors: "/api/sensors",
-      auth: "/api/auth",
-      reports: "/api/reports",
-      system: "/api/system"
-    }
+    message: "Soil Sage is Running, Thanks For Verifying !!!"
   });
 });
 
