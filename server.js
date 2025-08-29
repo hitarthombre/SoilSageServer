@@ -6,6 +6,7 @@ const currentReadingsRoutes = require("./routes/currentReadingsRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const systemStatusRoutes = require("./routes/systemStatusRoutes");
 const keepAliveRoutes = require("./routes/keepAliveRoutes");
+const calibrationRoutes = require("./routes/calibrationRoutes");
 const logger = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const cors = require("cors");
@@ -26,7 +27,7 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(express.json());
 app.use(logger);
 
-// Keep-alive routes (mount first to keep server awake)
+// Keep-alive routes
 app.use("/", keepAliveRoutes);
 
 // API Routes
@@ -35,6 +36,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/sensors", currentReadingsRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/system", systemStatusRoutes);
+app.use("/api/calibration", calibrationRoutes);
 
 // Error Handler
 app.use(errorHandler);

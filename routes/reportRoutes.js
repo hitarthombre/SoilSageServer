@@ -10,13 +10,22 @@ const validate = require("../middlewares/validate");
 
 const router = express.Router();
 
+const isValidDateInput = (value) => {
+  if (typeof value !== "string") return false;
+  // Accept YYYY-MM-DD or any parsable ISO date string
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  const parsed = Date.parse(trimmed);
+  return !Number.isNaN(parsed);
+};
+
 // Generate PDF report
 router.post(
   "/generate",
   [
-    body("startDate").isISO8601().withMessage("Start date must be a valid ISO date"),
-    body("endDate").isISO8601().withMessage("End date must be a valid ISO date"),
-    body("reportType").optional().isIn(["daily", "detailed"]).withMessage("Report type must be 'daily' or 'detailed'")
+    body("startDate").custom(isValidDateInput).withMessage("Start date must be a valid date (YYYY-MM-DD or ISO)"),
+    body("endDate").custom(isValidDateInput).withMessage("End date must be a valid date (YYYY-MM-DD or ISO)"),
+    body("reportType").optional().isIn(["daily", "detailed", "twoHourly24h"]).withMessage("Report type must be 'daily', 'detailed' or 'twoHourly24h'")
   ],
   validate,
   generateReport
@@ -26,8 +35,8 @@ router.post(
 router.get(
   "/data",
   [
-    query("startDate").isISO8601().withMessage("Start date must be a valid ISO date"),
-    query("endDate").isISO8601().withMessage("End date must be a valid ISO date")
+    query("startDate").custom(isValidDateInput).withMessage("Start date must be a valid date (YYYY-MM-DD or ISO)"),
+    query("endDate").custom(isValidDateInput).withMessage("End date must be a valid date (YYYY-MM-DD or ISO)")
   ],
   validate,
   getReportData

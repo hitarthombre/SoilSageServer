@@ -1,17 +1,29 @@
 const SoilData = require("../models/soilModel");
 
-// Get all plant names
+// Get all plants with only names and URLs
 const getFruits = async (req, res, next) => {
   try {
-    const plants = await SoilData.find({});
-    const fruits = plants.map((p) => p["Plant Name"]);
-    res.json({ total: fruits.length, fruits });
+    const plants = await SoilData.aggregate([
+      {
+        $group: {
+          _id: "$Plant Name",
+          uri: { $first: "$Uri" } // Pick first available image URL if exists
+        }
+      },
+      { $project: { _id: 0, name: "$_id", uri: 1 } },
+      { $sort: { name: 1 } } // Optional: sort alphabetically
+    ]);
+
+    res.json({
+      total: plants.length,
+      fruits: plants,
+    });
   } catch (err) {
     next(err);
   }
 };
 
-// Get all stages of a specific fruit
+// Get all stages of a specific fruit (only stage names)
 const getStages = async (req, res, next) => {
   try {
     const { name } = req.params;

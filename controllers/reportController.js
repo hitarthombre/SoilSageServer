@@ -4,7 +4,7 @@ const DailyAggregate = require("../models/dailyAggregateModel");
 
 const generateReport = async (req, res, next) => {
   try {
-    const { startDate, endDate, reportType = "daily" } = req.body;
+    const { startDate, endDate, reportType = "daily", fruit } = req.body;
 
     if (!startDate || !endDate) {
       return res.status(400).json({
@@ -39,7 +39,7 @@ const generateReport = async (req, res, next) => {
       });
     }
 
-    const filename = await reportService.generateReport(start, end, reportType);
+    const filename = await reportService.generateReport(start, end, reportType, { fruit });
 
     return res.status(200).json({
       success: true,
@@ -51,7 +51,8 @@ const generateReport = async (req, res, next) => {
         period: {
           startDate: start.toISOString(),
           endDate: end.toISOString()
-        }
+        },
+        fruit: fruit || null
       }
     });
 
