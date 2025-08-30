@@ -80,6 +80,8 @@ class DataCollectionService {
         irradiance: data.irradiance || 0,
         lux: data.lux || 0,
         moisture_percent: data.moisture_percent || 0,
+        moisture_percent_2: data.moisture_percent_2 || 0,
+        moisture_percent_3: data.moisture_percent_3 || 0,
         moisture_raw: data.moisture_raw || 0,
         temperature: data.temperature || 0,
         uv_index: data.uv_index || 0,
@@ -130,7 +132,9 @@ class DataCollectionService {
       const uvExposureHours = this.calculateUVExposureHours(sensorData, 3.0);
       
       // Calculate average water level
-      const waterLevelAvg = sensorData.reduce((sum, data) => sum + data.moisture_percent, 0) / sensorData.length;
+      const waterLevelAvg = sensorData.reduce((sum, data) => 
+        sum + (data.moisture_percent + data.moisture_percent_2 + data.moisture_percent_3) / 3, 0
+      ) / sensorData.length;
 
       // Create or update daily aggregate
       const dailyAggregate = new DailyAggregate({
@@ -142,6 +146,8 @@ class DataCollectionService {
         temperature: aggregates.temperature,
         humidity: aggregates.humidity,
         moisture_percent: aggregates.moisture_percent,
+        moisture_percent_2: aggregates.moisture_percent_2,
+        moisture_percent_3: aggregates.moisture_percent_3,
         uv_index: aggregates.uv_index,
         lux: aggregates.lux,
         total_readings: sensorData.length,
@@ -161,6 +167,8 @@ class DataCollectionService {
     const temperature = sensorData.map(d => d.temperature);
     const humidity = sensorData.map(d => d.humidity);
     const moisture_percent = sensorData.map(d => d.moisture_percent);
+    const moisture_percent_2 = sensorData.map(d => d.moisture_percent_2);
+    const moisture_percent_3 = sensorData.map(d => d.moisture_percent_3);
     const uv_index = sensorData.map(d => d.uv_index);
     const lux = sensorData.map(d => d.lux);
 
@@ -179,6 +187,16 @@ class DataCollectionService {
         min: Math.min(...moisture_percent),
         max: Math.max(...moisture_percent),
         avg: moisture_percent.reduce((sum, val) => sum + val, 0) / moisture_percent.length
+      },
+      moisture_percent_2: {
+        min: Math.min(...moisture_percent_2),
+        max: Math.max(...moisture_percent_2),
+        avg: moisture_percent_2.reduce((sum, val) => sum + val, 0) / moisture_percent_2.length
+      },
+      moisture_percent_3: {
+        min: Math.min(...moisture_percent_3),
+        max: Math.max(...moisture_percent_3),
+        avg: moisture_percent_3.reduce((sum, val) => sum + val, 0) / moisture_percent_3.length
       },
       uv_index: {
         min: Math.min(...uv_index),

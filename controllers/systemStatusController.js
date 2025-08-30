@@ -72,7 +72,7 @@ const getCollectionHistory = async (req, res, next) => {
     const recentCollections = await SensorData.find()
       .sort({ timestamp: -1 })
       .limit(parseInt(limit))
-      .select('timestamp temperature humidity moisture_percent uv_index lux battery_percent');
+      .select('timestamp temperature humidity moisture_percent moisture_percent_2 moisture_percent_3 uv_index lux battery_percent');
 
     // Get recent daily aggregates
     const recentAggregates = await DailyAggregate.find()
@@ -88,6 +88,8 @@ const getCollectionHistory = async (req, res, next) => {
           temperature: data.temperature,
           humidity: data.humidity,
           moisture_percent: data.moisture_percent,
+          moisture_percent_2: data.moisture_percent_2,
+          moisture_percent_3: data.moisture_percent_3,
           uv_index: data.uv_index,
           lux: data.lux,
           battery_percent: data.battery_percent
@@ -145,6 +147,8 @@ const getDataCollectionLogs = async (req, res, next) => {
           avgTemperature: 0,
           avgHumidity: 0,
           avgMoisture: 0,
+          avgMoisture2: 0,
+          avgMoisture3: 0,
           avgUV: 0,
           avgLux: 0
         };
@@ -154,6 +158,8 @@ const getDataCollectionLogs = async (req, res, next) => {
       hourlyStats[hour].avgTemperature += data.temperature;
       hourlyStats[hour].avgHumidity += data.humidity;
       hourlyStats[hour].avgMoisture += data.moisture_percent;
+      hourlyStats[hour].avgMoisture2 += data.moisture_percent_2;
+      hourlyStats[hour].avgMoisture3 += data.moisture_percent_3;
       hourlyStats[hour].avgUV += data.uv_index;
       hourlyStats[hour].avgLux += data.lux;
     });
@@ -165,6 +171,8 @@ const getDataCollectionLogs = async (req, res, next) => {
       stats.avgTemperature = (stats.avgTemperature / count).toFixed(1);
       stats.avgHumidity = (stats.avgHumidity / count).toFixed(1);
       stats.avgMoisture = (stats.avgMoisture / count).toFixed(2);
+      stats.avgMoisture2 = (stats.avgMoisture2 / count).toFixed(2);
+      stats.avgMoisture3 = (stats.avgMoisture3 / count).toFixed(2);
       stats.avgUV = (stats.avgUV / count).toFixed(2);
       stats.avgLux = (stats.avgLux / count).toFixed(0);
     });

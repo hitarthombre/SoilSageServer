@@ -9,6 +9,8 @@ const calibrationSchema = new mongoose.Schema(
     targets: {
       sunlight_lux: { type: Number, required: false, default: null },
       moisture_percent: { type: Number, required: false, default: null },
+      moisture_percent_2: { type: Number, required: false, default: null },
+      moisture_percent_3: { type: Number, required: false, default: null },
       temperature_c: { type: Number, required: false, default: null },
       humidity_percent: { type: Number, required: false, default: null },
       uv_index: { type: Number, required: false, default: null },

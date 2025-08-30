@@ -240,6 +240,8 @@ jobs:
           "irradiance": 0.05,
           "lux": 45,
           "moisture_percent": 0,
+          "moisture_percent_2": 0,
+          "moisture_percent_3": 0,
           "moisture_raw": 4095,
           "temperature": 31.7,
           "uv_index": 3.75,

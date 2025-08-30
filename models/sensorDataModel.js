@@ -9,6 +9,8 @@ const sensorDataSchema = new mongoose.Schema(
     irradiance: { type: Number, required: true },
     lux: { type: Number, required: true },
     moisture_percent: { type: Number, required: true },
+    moisture_percent_2: { type: Number, required: true },
+    moisture_percent_3: { type: Number, required: true },
     moisture_raw: { type: Number, required: true },
     temperature: { type: Number, required: true },
     uv_index: { type: Number, required: true },

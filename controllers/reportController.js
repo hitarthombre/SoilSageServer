@@ -125,6 +125,8 @@ const getLast24HoursData = async (req, res, next) => {
           temperature: data.temperature,
           humidity: data.humidity,
           moisture_percent: data.moisture_percent,
+          moisture_percent_2: data.moisture_percent_2,
+          moisture_percent_3: data.moisture_percent_3,
           uv_index: data.uv_index,
           lux: data.lux,
           battery_percent: data.battery_percent

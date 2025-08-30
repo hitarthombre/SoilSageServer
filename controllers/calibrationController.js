@@ -16,10 +16,12 @@ const calibrate = async (req, res, next) => {
     const end = new Date();
     const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
 
-    const data = await SensorData.find({ timestamp: { $gte: start, $lte: end } }).select("lux moisture_percent temperature humidity uv_index");
+    const data = await SensorData.find({ timestamp: { $gte: start, $lte: end } }).select("lux moisture_percent moisture_percent_2 moisture_percent_3 temperature humidity uv_index");
 
     const luxStats = computeStats(data.map(d => d.lux).filter(v => v != null));
     const moistStats = computeStats(data.map(d => d.moisture_percent).filter(v => v != null));
+    const moistStats2 = computeStats(data.map(d => d.moisture_percent_2).filter(v => v != null));
+    const moistStats3 = computeStats(data.map(d => d.moisture_percent_3).filter(v => v != null));
     const tempStats = computeStats(data.map(d => d.temperature).filter(v => v != null));
     const humStats = computeStats(data.map(d => d.humidity).filter(v => v != null));
     const uvStats = computeStats(data.map(d => d.uv_index).filter(v => v != null));
@@ -29,6 +31,8 @@ const calibrate = async (req, res, next) => {
     const targets = {
       sunlight_lux: pick(luxStats) ?? null,
       moisture_percent: pick(moistStats) ?? null,
+      moisture_percent_2: pick(moistStats2) ?? null,
+      moisture_percent_3: pick(moistStats3) ?? null,
       temperature_c: pick(tempStats) ?? null,
       humidity_percent: pick(humStats) ?? null,
       uv_index: pick(uvStats) ?? null,

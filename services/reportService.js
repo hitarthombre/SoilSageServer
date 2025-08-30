@@ -422,6 +422,8 @@ class ReportService {
           avgTemperature: sensorData.length > 0 ? sensorData.reduce((sum, d) => sum + d.temperature, 0) / sensorData.length : 0,
           avgHumidity: sensorData.length > 0 ? sensorData.reduce((sum, d) => sum + d.humidity, 0) / sensorData.length : 0,
           avgMoisture: sensorData.length > 0 ? sensorData.reduce((sum, d) => sum + d.moisture_percent, 0) / sensorData.length : 0,
+          avgMoisture2: sensorData.length > 0 ? sensorData.reduce((sum, d) => sum + d.moisture_percent_2, 0) / sensorData.length : 0,
+          avgMoisture3: sensorData.length > 0 ? sensorData.reduce((sum, d) => sum + d.moisture_percent_3, 0) / sensorData.length : 0,
           avgUV: sensorData.length > 0 ? sensorData.reduce((sum, d) => sum + d.uv_index, 0) / sensorData.length : 0
         }
       };

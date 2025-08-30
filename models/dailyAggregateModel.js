@@ -24,6 +24,16 @@ const dailyAggregateSchema = new mongoose.Schema(
       max: { type: Number, required: true },
       avg: { type: Number, required: true }
     },
+    moisture_percent_2: {
+      min: { type: Number, required: true },
+      max: { type: Number, required: true },
+      avg: { type: Number, required: true }
+    },
+    moisture_percent_3: {
+      min: { type: Number, required: true },
+      max: { type: Number, required: true },
+      avg: { type: Number, required: true }
+    },
     uv_index: {
       min: { type: Number, required: true },
       max: { type: Number, required: true },
